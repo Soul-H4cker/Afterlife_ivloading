@@ -18,24 +18,24 @@ function Loading() {
     }
     setAudiostate(!audiostate)
   }
+
   useEffect(() => {
-    setTimeout(() => {
-      if (counter == slides.length - 1) {
-        setCounter(0);
-      } else {
-        setCounter(counter + 1);
-      }
+    const timer = setTimeout(() => {
+      setCounter((prev) => (prev === slides.length - 1 ? 0 : prev + 1));
     }, 8000);
+    return () => clearTimeout(timer);
   }, [counter]);
 
   useEffect(() => {
-    setTimeout(() => {
-      if (progress < 100) {
-        setProgress(progress + 0.3);
-      }
-    }, 100);
+    const handleMessage = (event) => {
+      if (event.data.eventName !== "loadProgress") return;
+      // event.data.loadFraction is between 0 and 1
+      setProgress(event.data.loadFraction * 100);
+    };
 
-  }, [progress]);
+    window.addEventListener("message", handleMessage);
+    return () => window.removeEventListener("message", handleMessage);
+  }, []);
 
   return (
     <>
